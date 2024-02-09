@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import _ from "lodash"
 
 
@@ -20,6 +20,13 @@ const [data, setData] = useState<any[]>([])
     setData(paginatedData)
     setLoading(false)
   }
+
+  useEffect(() => {
+    getData()
+  }, [])
+  
+
+  return [loading , data]
 };
 
 export default usePaginatedFetch;
