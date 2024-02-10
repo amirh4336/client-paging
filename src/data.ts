@@ -10,3 +10,8 @@ export interface IDataProgrammer {
   linkedin: string;
   telegram: string;
 }
+
+export interface IData<T> {
+  totalRecords: number;
+  data: T[];
+}
