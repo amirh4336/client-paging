@@ -9,6 +9,7 @@ interface IUsePaginatedFetchProps {
 interface IUsePaginatedFetchResult<T> {
   data: T[][] | null;
   loading: boolean;
+  error: unknown | string;
 }
 
 const usePaginatedFetch = <T,>({
@@ -17,20 +18,25 @@ const usePaginatedFetch = <T,>({
 }: IUsePaginatedFetchProps): IUsePaginatedFetchResult<T> => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<T[][] | null>(null);
+  const [error, setError] = useState<unknown | string>("");
 
   useEffect(() => {
     const getData = async () => {
-      const response = await fetch(url);
-      const dataRes: T[] = await response.json();
-
-      const paginatedData = _.chunk(dataRes, pageSize);
-      setData(paginatedData);
-      setLoading(false);
+      try {
+        const response = await fetch(url);
+        const dataRes: T[] = await response.json();
+        const paginatedData = _.chunk(dataRes, pageSize);
+        setData(paginatedData);
+      } catch (e) {
+        setError(e);
+      } finally {
+        setLoading(false);
+      }
     };
     getData();
   }, [pageSize, url]);
 
-  return { loading, data };
+  return { error, loading, data };
 };
 
 export default usePaginatedFetch;
