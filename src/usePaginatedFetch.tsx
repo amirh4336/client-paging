@@ -1,32 +1,36 @@
 import { useEffect, useState } from "react";
-import _ from "lodash"
-
+import _ from "lodash";
 
 interface IUsePaginatedFetchProps {
   url: string;
   pageSize: number;
 }
 
-const usePaginatedFetch = ({ url, pageSize }: IUsePaginatedFetchProps) => {
-const [loading, setLoading] = useState(true)
-const [data, setData] = useState<any[]>([])
+interface IUsePaginatedFetchResult<T> {
+  data: T[][] | null;
+  loading: boolean;
+}
 
-  const getData = async  () => {
-    const response = await fetch(url)
-    const data = await response.json()
-
-    const paginatedData = _.chunk(data , pageSize);
-
-    setData(paginatedData)
-    setLoading(false)
-  }
+const usePaginatedFetch = <T,>({
+  url,
+  pageSize,
+}: IUsePaginatedFetchProps): IUsePaginatedFetchResult<T> => {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<T[][] | null>(null);
 
   useEffect(() => {
-    getData()
-  }, [])
-  
+    const getData = async () => {
+      const response = await fetch(url);
+      const dataRes: T[] = await response.json();
 
-  return [loading , data]
+      const paginatedData = _.chunk(dataRes, pageSize);
+      setData(paginatedData);
+      setLoading(false);
+    };
+    getData();
+  }, [pageSize, url]);
+
+  return { loading, data };
 };
 
 export default usePaginatedFetch;
